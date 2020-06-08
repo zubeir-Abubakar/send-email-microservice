@@ -21,6 +21,6 @@ schema_view = get_swagger_view(title="Send Email Docs")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', schema_view),
+    #path('', schema_view),
     path('api/v1/', include('api.urls'))
 ]

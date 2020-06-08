@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+# We'll change it to an envireonment variable when we deploy
+SENDGRID_API_KEY = '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'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

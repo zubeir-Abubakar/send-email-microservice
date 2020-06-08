@@ -1,12 +1,66 @@
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from sendgrid import SendGridAPIClient
+from .serializers import MailSerializer, TemplateMailSerializer
+from send_email_microservice.settings import SENDGRID_API_KEY
 
-@api_view(['POST'])
-def send_email(request):
-    # Do something with request.data
-    pass
+class SendMail(APIView):
 
-@api_view(['POST'])
-def send_email_with_template(request):
-    # Do something with request.data
-    pass
+    def post(self, request):
+        mail_sz = MailSerializer(data=request.data)
+        if mail_sz.is_valid():
+            return send_email(mail_sz.validated_data)
+        else:
+            return Response({
+                'status': 'failure',
+                'data': { 'message': 'Incorrect request format.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+class SendMailWithTemplate(APIView):
+
+    def post(self, request):
+        template_mail_sz = MailSerializer(data=request.data)
+        if template_mail_sz.is_valid():
+            return send_email(template_mail_sz.validated_data, is_html_template=True)
+        else:
+            return Response({
+                'status': 'failure',
+                'data': { 'message': 'Incorrect request format.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+def send_email(options, is_html_template=False):
+    body_type = 'text/plain'
+    body = options['body']
+
+    if is_html_template:
+        body_type = 'text/html'
+        body = options['htmlBody']
+
+    data = {
+        'personalizations': [{
+            'to': [{'email': options['recipient']}],
+            'cc': map(lambda email: email.strip(), options['cc'].split(',')),
+            'bcc': map(lambda email: email.strip(), options['bcc'].split(',')),
+            'subject': options['subject']
+        }],
+        'from': {'email': options['sender']},
+        'content': [{
+            'type': body_type,
+            'value': body
+        }],
+    }
+
+    sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
+    response = sg.client.mail.send.post(request_body=data)
+    if response.status_code != 202:
+        return Response({
+            'status': 'failure',
+            'data': { 'message': 'An error occurred.'}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({
+        'status': 'success',
+        'data': { 'message': 'Mail sent successfully.'}
+    }, status=status.HTTP_200_OK)

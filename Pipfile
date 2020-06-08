@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 django = "*"
 djangorestframework = "*"
+requests = "*"
+sendgrid = "*"
 
 [requires]
 python_version = "3.8"
