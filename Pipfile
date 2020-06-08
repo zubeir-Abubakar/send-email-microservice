@@ -10,6 +10,8 @@ django = "*"
 djangorestframework = "*"
 requests = "*"
 sendgrid = "*"
+python-dotenv = "*"
+drf-yasg = "*"
 
 [requires]
 python_version = "3.8"
