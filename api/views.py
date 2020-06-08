@@ -15,7 +15,7 @@ class SendMail(APIView):
         else:
             return Response({
                 'status': 'failure',
-                'data': { 'message': 'Incorrect request format.'}
+                'data': { 'message': 'Incorrect request format.', 'errors': mail_sz.errors}
             }, status=status.HTTP_400_BAD_REQUEST)
 
 class SendMailWithTemplate(APIView):
@@ -41,8 +41,8 @@ def send_email(options, is_html_template=False):
     data = {
         'personalizations': [{
             'to': [{'email': options['recipient']}],
-            'cc': map(lambda email: email.strip(), options['cc'].split(',')),
-            'bcc': map(lambda email: email.strip(), options['bcc'].split(',')),
+            'cc': [{'email': email.strip()} for email in options['cc'].split(',')],
+            'bcc': [{'email': email.strip()} for email in options['bcc'].split(',')],
             'subject': options['subject']
         }],
         'from': {'email': options['sender']},
