@@ -6,16 +6,18 @@ from sendgrid import SendGridAPIClient
 from .serializers import MailSerializer, TemplateMailSerializer
 from send_email_microservice.settings import SENDGRID_API_KEY
 
+MAIL_RESPONSES = {
+    '200': 'Mail sent successfully.',
+    '401': 'Incorrect request format.',
+    '500': 'An error occurred, could not send email.' 
+}
+
 class SendMail(APIView):
 
     @swagger_auto_schema(
         request_body=MailSerializer,
         operation_description="Sends email as plain text to recipient from sender.",
-        responses={
-            '200': 'Mail sent successfully.',
-            '401': 'Incorrect request format.',
-            '500': 'An error occurred.' 
-        }
+        responses=MAIL_RESPONSES
     )
     def post(self, request):
         mail_sz = MailSerializer(data=request.data)
@@ -32,11 +34,7 @@ class SendMailWithTemplate(APIView):
     @swagger_auto_schema(
         request_body=TemplateMailSerializer,
         operation_description="Sends email as HTML template to recipient from sender.",
-        responses={
-            '200': 'Mail sent successfully.',
-            '401': 'Incorrect request format.',
-            '500': 'An error occurred.' 
-        }
+        responses=MAIL_RESPONSES
     )
     def post(self, request):
         template_mail_sz = TemplateMailSerializer(data=request.data)
@@ -81,11 +79,11 @@ def send_email(options, is_html_template=False):
         data['personalizations'][0]['bcc'] = get_email_dict(options['bcc'], ',')
 
     sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
-    response = sg.client.mail.send.post(request_body=data)
-    if response.status_code != 202:
+    try: sg.client.mail.send.post(request_body=data)
+    except:
         return Response({
             'status': 'failure',
-            'data': { 'message': 'An error occurred.'}
+            'data': { 'message': 'An error occurred, could not send email.'}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
