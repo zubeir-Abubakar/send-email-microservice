@@ -21,7 +21,7 @@ class SendMail(APIView):
 class SendMailWithTemplate(APIView):
 
     def post(self, request):
-        template_mail_sz = MailSerializer(data=request.data)
+        template_mail_sz = TemplateMailSerializer(data=request.data)
         if template_mail_sz.is_valid():
             return send_email(template_mail_sz.validated_data, is_html_template=True)
         else:
