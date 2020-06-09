@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from drf_yasg.utils import swagger_auto_schema
 from sendgrid import SendGridAPIClient
 from .serializers import MailSerializer, TemplateMailSerializer
 from send_email_microservice.settings import SENDGRID_API_KEY
@@ -27,10 +27,14 @@ class SendMailWithTemplate(APIView):
         else:
             return Response({
                 'status': 'failure',
-                'data': { 'message': 'Incorrect request format.'}
+                'data': { 'message': 'Incorrect request format.', 'errors': template_mail_sz.errors}
             }, status=status.HTTP_400_BAD_REQUEST)
 
 def send_email(options, is_html_template=False):
+
+    def get_email_dict(emails, delimeter):
+        return [{'email': email.strip()} for email in emails.split(delimeter)]
+
     body_type = 'text/plain'
     body = options['body']
 
@@ -41,8 +45,6 @@ def send_email(options, is_html_template=False):
     data = {
         'personalizations': [{
             'to': [{'email': options['recipient']}],
-            'cc': [{'email': email.strip()} for email in options['cc'].split(',')],
-            'bcc': [{'email': email.strip()} for email in options['bcc'].split(',')],
             'subject': options['subject']
         }],
         'from': {'email': options['sender']},
@@ -51,6 +53,12 @@ def send_email(options, is_html_template=False):
             'value': body
         }],
     }
+
+    if len(options['cc']) > 0:
+        data['personalizations'][0]['cc'] = get_email_dict(options['cc'], ',')
+
+    if len(options['bcc']) > 0:
+        data['personalizations'][0]['bcc'] = get_email_dict(options['bcc'], ',')
 
     sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
     response = sg.client.mail.send.post(request_body=data)
