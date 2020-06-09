@@ -36,11 +36,13 @@ def send_email(options, is_html_template=False):
         return [{'email': email.strip()} for email in emails.split(delimeter)]
 
     body_type = 'text/plain'
-    body = options['body']
+    body = ''
 
     if is_html_template:
         body_type = 'text/html'
         body = options['htmlBody']
+    else:
+        body = options['body']
 
     data = {
         'personalizations': [{

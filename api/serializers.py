@@ -10,4 +10,4 @@ class MailSerializer(serializers.Serializer):
 
 class TemplateMailSerializer(MailSerializer):
     body = None
-    htmlBody = serializers.CharField(source='body')
+    htmlBody = serializers.CharField()
