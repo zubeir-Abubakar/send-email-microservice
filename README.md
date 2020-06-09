@@ -1,5 +1,7 @@
 ## A Dockerized Micro-service for sending Email Notifications by Team-Fierce
-_____________________________________________________________________________
+
+![alt text](https://res.cloudinary.com/echefulouis/image/upload/v1591716347/Capture_p1txz0.png)
+
 # Description:
 This is an Email micro-service that sends emails using Swagger UI template and an API. It was built to avoid development teams having to configure mail over and over on projects involving a micro-services infrastructure.
 
@@ -12,7 +14,7 @@ Documentation is managed by Swagger with the drf-yasg module.
 
 # Requirements:
 This Project requires the following Versions:
-> Python (3.5, 3.6, 3.7, 3.8)
+> Python (3.5, 3.6, 3.7, 3.8) \n
 > Django (1.11, 2.0, 2.1, 2.2, 3.0)
 
 # Install:
