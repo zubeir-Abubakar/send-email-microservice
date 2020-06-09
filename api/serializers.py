@@ -5,8 +5,8 @@ class MailSerializer(serializers.Serializer):
     sender = serializers.EmailField()
     subject = serializers.CharField()
     body = serializers.CharField()
-    cc = serializers.CharField(allow_blank=True)
-    bcc = serializers.CharField(allow_blank=True)
+    cc = serializers.CharField(required=False, allow_blank=True)
+    bcc = serializers.CharField(required=False, allow_blank=True)
 
 class TemplateMailSerializer(MailSerializer):
     body = None

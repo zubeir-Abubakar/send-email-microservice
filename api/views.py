@@ -8,6 +8,15 @@ from send_email_microservice.settings import SENDGRID_API_KEY
 
 class SendMail(APIView):
 
+    @swagger_auto_schema(
+        request_body=MailSerializer,
+        operation_description="Sends email as plain text to recipient from sender.",
+        responses={
+            '200': 'Mail sent successfully.',
+            '401': 'Incorrect request format.',
+            '500': 'An error occurred.' 
+        }
+    )
     def post(self, request):
         mail_sz = MailSerializer(data=request.data)
         if mail_sz.is_valid():
@@ -20,6 +29,15 @@ class SendMail(APIView):
 
 class SendMailWithTemplate(APIView):
 
+    @swagger_auto_schema(
+        request_body=TemplateMailSerializer,
+        operation_description="Sends email as HTML template to recipient from sender.",
+        responses={
+            '200': 'Mail sent successfully.',
+            '401': 'Incorrect request format.',
+            '500': 'An error occurred.' 
+        }
+    )
     def post(self, request):
         template_mail_sz = TemplateMailSerializer(data=request.data)
         if template_mail_sz.is_valid():
